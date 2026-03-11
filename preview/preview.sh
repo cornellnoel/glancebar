@@ -42,9 +42,9 @@ print_table() {
   echo ""
   echo "  $title"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
-  # Header uses a 12-char spacer for METER to match 6 double-width braille cells
-  printf "  ${dim}%-12s %-12s  %4s  %-9s %-10s %s${reset}\n" \
-    "PROJECT" "METER" "USED" "TOKENS" "MODEL" "COLOR"
+  # Use braille spaces (⠀) so header width matches braille blocks exactly
+  printf "  ${dim}%-12s ⠀⠀⠀⠀⠀⠀ %4s  %-9s %-10s %s${reset}\n" \
+    "PROJECT" "USED" "TOKENS" "MODEL" "COLOR"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
 
   IFS=',' read -ra labels <<< "$color_labels"
