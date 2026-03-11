@@ -42,9 +42,8 @@ print_table() {
   echo ""
   echo "  $title"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
-  # Braille chars are double-width (2 cells each), so 6 chars = 12 extra cells
-  # Headers need 6 extra spaces after METER to compensate
-  printf "  ${dim}%-12s %-19s %5s  %-10s %-10s %s${reset}\n" \
+  # Header uses a 12-char spacer for METER to match 6 double-width braille cells
+  printf "  ${dim}%-12s %-12s  %4s  %-9s %-10s %s${reset}\n" \
     "PROJECT" "METER" "USED" "TOKENS" "MODEL" "COLOR"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
 
