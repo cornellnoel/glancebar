@@ -56,16 +56,17 @@ else
   color='\033[32m'               # green
 fi
 reset='\033[0m'
+empty='\033[38;5;237m'
 
-# Build 6-block all-or-nothing bar
+# Build 6-block bar (dim ⣿ for empty blocks — same char width as filled)
 bar_blocks=6
 filled=$(( pct_used * bar_blocks / 100 ))
 if [ $pct_used -gt 0 ] && [ $filled -eq 0 ]; then filled=1; fi
 
-bar="${color}"
+bar=""
 i=0
 while [ $i -lt $bar_blocks ]; do
-  if [ $i -lt $filled ]; then bar="${bar}⣿"; else bar="${bar}⠀"; fi
+  if [ $i -lt $filled ]; then bar="${bar}${color}⣿"; else bar="${bar}${empty}⣿"; fi
   i=$(( i + 1 ))
 done
 bar="${bar}${reset}"

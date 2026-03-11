@@ -24,6 +24,8 @@ get_color_cb() {
   fi
 }
 
+empty='\033[38;5;237m'
+
 render_bar() {
   local pct=$1 color_fn=$2
   local filled=$(( pct * 6 / 100 ))
@@ -31,9 +33,9 @@ render_bar() {
   local color=$($color_fn $pct)
   local bar=""
   for (( i=0; i<6; i++ )); do
-    if [ $i -lt $filled ]; then bar="${bar}⣿"; else bar="${bar}⠀"; fi
+    if [ $i -lt $filled ]; then bar="${bar}${color}⣿"; else bar="${bar}${empty}⣿"; fi
   done
-  printf "${color}%s${reset}" "$bar"
+  printf "%b${reset}" "$bar"
 }
 
 print_table() {
