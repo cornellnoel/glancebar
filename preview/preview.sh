@@ -5,6 +5,7 @@
 
 reset='\033[0m'
 dim='\033[38;5;240m'
+underline='\033[4m'
 
 get_color() {
   local remaining=$(( 100 - $1 ))
@@ -31,11 +32,14 @@ echo ""
 echo "  Glancebar: Gauge"
 echo "  ────────────────"
 echo ""
+printf "  ${dim}%-12s  %-12s %-4s %-9s %-9s  %-6s${reset}\n" \
+  "PROJECT" "METER" "USED" "TOKENS" "MODEL" "COLOR"
+printf "  ${dim}%-12s  %-12s %-4s %-9s %-9s  %-6s${reset}\n" \
+  "───────" "─────" "────" "──────" "─────" "─────"
 
 for pct in 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100; do
   bar=$(render_bar $pct)
   tok=$(( pct * 2 ))
-  # Color label
   remaining=$(( 100 - pct ))
   if [ "$remaining" -le 10 ]; then label="${dim}red${reset}"
   elif [ "$remaining" -le 20 ]; then label="${dim}orange${reset}"
@@ -46,7 +50,7 @@ for pct in 0 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 100; do
 done
 
 echo ""
-echo "  With working directory:"
+printf "  ${dim}With working directory:${reset}\n"
 bar=$(render_bar 45)
 printf "  MY PROJECT  %b  45%% 90k/200k Opus 4.6  ${dim}[src/components]${reset}\n" "$bar"
 echo ""
