@@ -1,0 +1,92 @@
+#!/bin/bash
+# Glancebar: Gauge
+# A context-aware statusline for Claude Code
+# Shows: PROJECT  ⣿⣿⣿⠀⠀⠀ 45% 90k/200k Opus 4.6  [cwd]
+#
+# 6-block braille meter fills up as context is consumed
+# Colors: green (>40% left) → yellow (20-40%) → orange (10-20%) → red (<10%)
+# Working directory shown in brackets only when different from project root
+
+input=$(cat)
+
+# Parse all fields in one jq call
+eval "$(echo "$input" | jq -r '
+  @sh "model=\(.model.display_name // "Unknown")",
+  @sh "project_dir=\(.workspace.project_dir // .cwd // .workspace.current_dir // "")",
+  @sh "cwd=\(.cwd // .workspace.current_dir // "")",
+  @sh "used=\(.context_window.used_percentage // "")",
+  @sh "in_tok=\(.context_window.total_input_tokens // 0)",
+  @sh "out_tok=\(.context_window.total_output_tokens // 0)",
+  @sh "ctx_size=\(.context_window.context_window_size // 200000)"
+')"
+
+folder=$(basename "$project_dir" | tr '[:lower:]' '[:upper:]')
+
+# Format total tokens
+total_tok=$(( in_tok + out_tok ))
+if [ $total_tok -ge 1000000 ]; then
+  tok_fmt="$(echo "scale=1; $total_tok/1000000" | bc)M"
+elif [ $total_tok -ge 1000 ]; then
+  tok_fmt="$(echo "scale=0; $total_tok/1000" | bc)k"
+else
+  tok_fmt="$total_tok"
+fi
+
+# Format context window size
+if [ $ctx_size -ge 1000000 ]; then
+  ctx_fmt="$(echo "scale=0; $ctx_size/1000000" | bc)M"
+elif [ $ctx_size -ge 1000 ]; then
+  ctx_fmt="$(echo "scale=0; $ctx_size/1000" | bc)k"
+else
+  ctx_fmt="$ctx_size"
+fi
+
+# If no context data yet, just show folder + model
+if [ -z "$used" ]; then
+  printf ' %s  %s' "$folder" "$model"
+  exit 0
+fi
+
+pct_used=${used%.*}
+pct_remaining=$(( 100 - pct_used ))
+
+# Color based on REMAINING threshold
+if [ "$pct_remaining" -le 10 ]; then
+  color='\033[1;31m'             # bold red
+elif [ "$pct_remaining" -le 20 ]; then
+  color='\033[38;5;208m'         # orange
+elif [ "$pct_remaining" -le 40 ]; then
+  color='\033[33m'               # yellow
+else
+  color='\033[32m'               # green
+fi
+reset='\033[0m'
+
+# Build 6-block all-or-nothing bar
+bar_blocks=6
+filled=$(( pct_used * bar_blocks / 100 ))
+if [ $pct_used -gt 0 ] && [ $filled -eq 0 ]; then filled=1; fi
+
+bar="${color}"
+i=0
+while [ $i -lt $bar_blocks ]; do
+  if [ $i -lt $filled ]; then bar="${bar}⣿"; else bar="${bar}⠀"; fi
+  i=$(( i + 1 ))
+done
+bar="${bar}${reset}"
+
+# Working directory suffix (only if different from project dir)
+cwd_suffix=""
+if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
+  # Show relative path from project dir
+  rel_cwd="${cwd#$project_dir/}"
+  if [ "$rel_cwd" != "$cwd" ]; then
+    cwd_suffix="  [$rel_cwd]"
+  else
+    short_cwd=$(basename "$cwd")
+    cwd_suffix="  [$short_cwd]"
+  fi
+fi
+
+printf ' %s  %b %d%% %s/%s %s%s' \
+  "$folder" "$bar" "$pct_used" "$tok_fmt" "$ctx_fmt" "$model" "$cwd_suffix"
