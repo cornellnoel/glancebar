@@ -1,6 +1,6 @@
 # Glancebar
 
-Statusline themes for Claude Code. Designed for glancing — one look, you know where you stand.
+Glanceable statusline themes for Claude Code.
 
 ![Glancebar Gauge Preview](screenshots/gauge-preview.png)
 
