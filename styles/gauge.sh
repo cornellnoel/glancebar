@@ -1,11 +1,8 @@
 #!/bin/bash
 # Glancebar: Gauge
-# A context-aware statusline for Claude Code
-# Shows: PROJECT  ⣿⣿⣿⠀⠀⠀ 45% 90k/200k Opus 4.6  [cwd]
-#
-# 6-block braille meter fills up as context is consumed
-# Colors: green (>40% left) → yellow (20-40%) → orange (10-20%) → red (<10%)
-# Working directory shown in brackets only when different from project root
+# Layout: FOLDER  ⣿⣿⣿⠀⠀⠀ 45% 90k/200k Opus 4.6  [cwd if different]
+# 6-block all-or-nothing bar, fills up as context consumed
+# Colors: green > 40% left, yellow 20-40%, orange 10-20%, red < 10%
 
 input=$(cat)
 
@@ -15,22 +12,10 @@ eval "$(echo "$input" | jq -r '
   @sh "project_dir=\(.workspace.project_dir // .cwd // .workspace.current_dir // "")",
   @sh "cwd=\(.cwd // .workspace.current_dir // "")",
   @sh "used=\(.context_window.used_percentage // "")",
-  @sh "in_tok=\(.context_window.total_input_tokens // 0)",
-  @sh "out_tok=\(.context_window.total_output_tokens // 0)",
   @sh "ctx_size=\(.context_window.context_window_size // 200000)"
 ')"
 
 folder=$(basename "$project_dir" | tr '[:lower:]' '[:upper:]')
-
-# Format total tokens
-total_tok=$(( in_tok + out_tok ))
-if [ $total_tok -ge 1000000 ]; then
-  tok_fmt="$(echo "scale=1; $total_tok/1000000" | bc)M"
-elif [ $total_tok -ge 1000 ]; then
-  tok_fmt="$(echo "scale=0; $total_tok/1000" | bc)k"
-else
-  tok_fmt="$total_tok"
-fi
 
 # Format context window size
 if [ $ctx_size -ge 1000000 ]; then
@@ -49,6 +34,16 @@ fi
 
 pct_used=${used%.*}
 pct_remaining=$(( 100 - pct_used ))
+
+# Calculate current context usage from percentage (not cumulative session totals)
+current_tok=$(( pct_used * ctx_size / 100 ))
+if [ $current_tok -ge 1000000 ]; then
+  tok_fmt="$(echo "scale=1; $current_tok/1000000" | bc)M"
+elif [ $current_tok -ge 1000 ]; then
+  tok_fmt="$(echo "scale=0; $current_tok/1000" | bc)k"
+else
+  tok_fmt="$current_tok"
+fi
 
 # Color based on REMAINING threshold
 if [ "$pct_remaining" -le 10 ]; then
@@ -78,7 +73,6 @@ bar="${bar}${reset}"
 # Working directory suffix (only if different from project dir)
 cwd_suffix=""
 if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
-  # Show relative path from project dir
   rel_cwd="${cwd#$project_dir/}"
   if [ "$rel_cwd" != "$cwd" ]; then
     cwd_suffix="  [$rel_cwd]"

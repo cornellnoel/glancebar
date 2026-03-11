@@ -42,9 +42,10 @@ print_table() {
   echo ""
   echo "  $title"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
-  # Use braille spaces (⠀) so header width matches braille blocks exactly
-  printf "  ${dim}%-12s ⠀⠀⠀⠀⠀⠀ %4s  %-9s %-10s %s${reset}\n" \
-    "PROJECT" "USED" "TOKENS" "MODEL" "COLOR"
+  # Header bar uses dimmed ⣿ blocks so width matches colored data bars exactly
+  header_bar="${dim}⣿⣿⣿⣿⣿⣿${reset}"
+  printf "  %-12s %b %5s  %-9s %-10s ${dim}%s${reset}\n" \
+    "PROJECT" "$header_bar" " USED" "TOKENS" "MODEL" "COLOR"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
 
   IFS=',' read -ra labels <<< "$color_labels"
