@@ -44,8 +44,9 @@ print_table() {
   echo ""
   echo "  $title"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
-  # Header bar uses dimmed ⣿ blocks so width matches colored data bars exactly
-  header_bar="${dim}⣿⣿⣿⣿⣿⣿${reset}"
+  # Header bar rendered through same render_bar path as data rows
+  get_color_dim() { printf '\033[38;5;240m'; }
+  header_bar=$(render_bar 100 get_color_dim)
   printf "  %-12s %b %5s  %-10s %-10s ${dim}%s${reset}\n" \
     "PROJECT" "$header_bar" "USED" "TOKENS" "MODEL" "COLOR"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
