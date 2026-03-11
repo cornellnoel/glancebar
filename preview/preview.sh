@@ -46,8 +46,8 @@ print_table() {
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
   # Header bar uses dimmed ⣿ blocks so width matches colored data bars exactly
   header_bar="${dim}⣿⣿⣿⣿⣿⣿${reset}"
-  printf "  %-12s %b %5s  %-9s %-10s ${dim}%s${reset}\n" \
-    "PROJECT" "$header_bar" " USED" "TOKENS" "MODEL" "COLOR"
+  printf "  %-12s %b %5s  %-10s %-10s ${dim}%s${reset}\n" \
+    "PROJECT" "$header_bar" "USED" "TOKENS" "MODEL" "COLOR"
   printf "  ${dim}──────────────────────────────────────────────────────────────────${reset}\n"
 
   IFS=',' read -ra labels <<< "$color_labels"
