@@ -72,5 +72,15 @@ print_table() {
   echo ""
 }
 
+get_color_gs() {
+  local remaining=$(( 100 - $1 ))
+  if [ "$remaining" -le 10 ]; then printf '\033[1;7m'
+  elif [ "$remaining" -le 20 ]; then printf '\033[1m'
+  elif [ "$remaining" -le 40 ]; then printf '\033[0m'
+  else printf '\033[2m'
+  fi
+}
+
 print_table "Glancebar: Gauge" "get_color" "green,yellow,orange,red"
 print_table "Glancebar: Gauge (Colorblind-safe)" "get_color_cb" "blue,cyan,yellow,magenta"
+print_table "Glancebar: Gauge (Grayscale)" "get_color_gs" "dim,normal,bright,inverse"

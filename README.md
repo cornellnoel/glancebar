@@ -72,6 +72,30 @@ Or paste this into Claude Code:
 Download https://raw.githubusercontent.com/cornellnoel/glancebar/main/styles/gauge-colorblind.sh to ~/.claude/scripts/statusline.sh and update my ~/.claude/settings.json to set statusLine to {"type":"command","command":"bash ~/.claude/scripts/statusline.sh"}
 ```
 
+## Grayscale Version
+
+No color at all — just brightness. Works on any terminal, any display, any vision. The bar shape does the work; brightness adds emphasis.
+
+| Context remaining | Style        | Meaning              |
+|-------------------|--------------|----------------------|
+| > 40%             | Dim          | You're fine           |
+| 20–40%            | Normal       | Heads up              |
+| 10–20%            | Bright/bold  | Start wrapping up     |
+| < 10%             | Bold inverse | Almost out of context |
+
+**Install:**
+
+```bash
+# Download the grayscale version
+mkdir -p ~/.claude/scripts && curl -sL https://raw.githubusercontent.com/cornellnoel/glancebar/main/styles/gauge-grayscale.sh -o ~/.claude/scripts/statusline.sh && echo '✓ Downloaded! Now add this to ~/.claude/settings.json:' && echo '  "statusLine": { "type": "command", "command": "bash ~/.claude/scripts/statusline.sh" }'
+```
+
+Or paste this into Claude Code:
+
+```
+Download https://raw.githubusercontent.com/cornellnoel/glancebar/main/styles/gauge-grayscale.sh to ~/.claude/scripts/statusline.sh and update my ~/.claude/settings.json to set statusLine to {"type":"command","command":"bash ~/.claude/scripts/statusline.sh"}
+```
+
 ## Preview
 
 Run the preview script to see all styles with live colors in your terminal:
